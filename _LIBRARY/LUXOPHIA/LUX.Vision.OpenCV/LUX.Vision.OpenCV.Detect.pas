@@ -92,10 +92,10 @@ begin
 
      ScaleFactor  := 1.2;
      MinNeighbors := 2;
-     MinSizeX     := 0;
-     MinSizeY     := 0;
-     MaxSizeX     := 0;
-     MaxSizeY     := 0;
+     MinSizeX     := 64;
+     MinSizeY     := 64;
+     MaxSizeX     := 256;
+     MaxSizeY     := 256;
 end;
 
 destructor THaarCascade.Destroy;
