@@ -21,7 +21,7 @@ type
     { public 宣言 }
     _Camera :TocvCamera;
     _Detect :THaarCascade;
-    _Image  :TocvBitmap4;
+    _Frame  :TocvBitmap1;
     ///// メソッド
     procedure ShowDetect;
   end;
@@ -33,6 +33,8 @@ implementation //###############################################################
 
 {$R *.fmx}
 
+uses ocv.imgproc_c;
+
 //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& private
 
 //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& public
@@ -41,9 +43,7 @@ procedure TForm1.ShowDetect;
 var
    I :Integer;
 begin
-     _Camera.Frame.CopyTo( _Image );
-
-     _Image.CopyTo( Image1.Bitmap );
+     _Frame.CopyTo( Image1.Bitmap );
 
      with Image1.Bitmap.Canvas do
      begin
@@ -68,7 +68,7 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-     _Camera := TocvCamera.Create( 0 );
+     _Camera := TocvCamera.Create( 0, 320, 240 );
 
      _Detect := THaarCascade.Create( '..\..\_LIBRARY\LUXOPHIA\LUX.Vision.OpenCV\'
                                    + '：Laex\Delphi-OpenCV\resource\facedetectxml\'
@@ -76,7 +76,7 @@ begin
 
      with _Camera do
      begin
-          _Image := TocvBitmap4.Create( FrameWidth, FrameHeight );
+          _Frame := TocvBitmap1.Create( FrameWidth, FrameHeight );
 
           Image1.Bitmap.SetSize( FrameWidth, FrameHeight );
      end;
@@ -84,11 +84,11 @@ end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
-     _Image.Free;
+     _Frame.DisposeOf;
 
-     _Detect.Free;
+     _Detect.DisposeOf;
 
-     _Camera.Free;
+     _Camera.DisposeOf;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,7 +97,9 @@ procedure TForm1.Timer1Timer(Sender: TObject);
 begin
      _Camera.QueryFrame;
 
-     _Detect.Search( _Camera.Frame );
+     _Frame.CopyFrom( _Camera.Frame );
+
+     _Detect.Search( _Frame );
 
      ShowDetect;
 end;
